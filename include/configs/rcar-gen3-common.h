@@ -56,7 +56,7 @@
 #define CONFIG_SYS_BOOTM_LEN		(64 << 20)
 
 /* The HF/QSPI layout permits up to 1 MiB large bootloader blob */
-#define CONFIG_BOARD_SIZE_LIMIT		1048576
+#define CONFIG_BOARD_SIZE_LIMIT		2097152
 
 /* ENV setting */
 
