@@ -10,7 +10,7 @@
 &extalr_clk {
 	u-boot,dm-pre-reloc;
 };
-
+/*
 /delete-node/ &audma0;
 /delete-node/ &audma1;
 /delete-node/ &can0;
@@ -53,3 +53,4 @@
 		/delete-node/ fdp1@fe940000;
 	};
 };
+*/
