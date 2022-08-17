@@ -61,13 +61,57 @@
 /* ENV setting */
 
 #define CONFIG_EXTRA_ENV_SETTINGS	\
-	"usb_pgood_delay=2000\0" \
-	"bootm_size=0x10000000\0"
+	"fdt_addr_r=0x48000000\0" \
+	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
+	"kernel_addr_r=0x48080000\0" \
+	"boot_efi_binary=efi/boot/"BOOTEFI_NAME"\0" \
+	"boot_mmc=" \
+			"if test -e mmc ${mmcdev}:1 ${boot_efi_binary}; then " \
+				"load mmc ${mmcdev}:1 " \
+				"${kernel_addr_r} ${boot_efi_binary};" \
+				"bootefi ${kernel_addr_r};" \
+			"elif test -e mmc ${mmcdev}:2 ${boot_efi_binary}; then " \
+				"load mmc ${mmcdev}:2 " \
+				"${kernel_addr_r} ${boot_efi_binary};" \
+				"bootefi ${kernel_addr_r};" \
+			"fi;\0" \
+	"boot_usb=" \
+			"if test -e usb ${usbdev}:1 ${boot_efi_binary}; then " \
+				"fatload usb ${usbdev}:1 " \
+				"${kernel_addr_r} ${boot_efi_binary};" \
+				"bootefi ${kernel_addr_r};" \
+			"elif test -e usb ${usbdev}:2 ${boot_efi_binary}; then " \
+				"fatload usb ${usbdev}:2 " \
+				"${kernel_addr_r} ${boot_efi_binary};" \
+				"bootefi ${kernel_addr_r};" \
+			"fi;\0" \
+	"load_mmc=" \
+			"setenv mmcdev 0;" \
+			"run boot_mmc;" \
+			"setenv mmcdev 1;" \
+			"run boot_mmc; \0" \
+	"load_usb=" \
+			"usb start;" \
+			"setenv usbdev 0;" \
+			"run boot_usb;"\
+			"setenv usbdev 1;" \
+			"run boot_usb;\0" \
+	"distro_bootcmd=" \
+			"run load_mmc;" \
+			"run load_usb;\0" \
+	"bootcmd=run distro_bootcmd\0" \
 
-#define CONFIG_BOOTCOMMAND	\
-	"tftp 0x48080000 Image; " \
-	"tftp 0x48000000 Image-"CONFIG_DEFAULT_FDT_FILE"; " \
-	"booti 0x48080000 - 0x48000000"
+
+
+#ifndef CONFIG_SPL_BUILD
+#define BOOT_TARGET_DEVICES(func) \
+        func(MMC, mmc, 1) \
+        func(MMC, mmc, 0) \
+        func(USB, usb, 0) \
+        func(PXE, pxe, na) \
+        func(DHCP, dhcp, na)
+#include <config_distro_bootcmd.h>
+#endif
 
 /* SPL support */
 #if defined(CONFIG_R8A7795) || defined(CONFIG_R8A7796) || defined(CONFIG_R8A77965)

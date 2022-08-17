@@ -201,7 +201,7 @@ int env_load(void)
 		if (!ret) {
 			printf("OK\n");
 			gd->env_load_prio = prio;
-
+			env_set_default(NULL,0);
 #if !CONFIG_IS_ENABLED(ENV_APPEND)
 			return 0;
 #endif
