@@ -201,12 +201,14 @@ int board_fit_config_name_match(const char *name)
 
 int board_late_init(void)
 {
+	const char * const default_vars[] = {"fdt_addr_r", "kernel_addr_r", "boot_efi_binary", "distro_bootcmd", "scan_for_usb_dev", "scan_boot_efi", "mmc0", "mmc1", "usb0", "usb1", };
+
 #ifdef CONFIG_WDT_RENESAS
 	reinitr_wdt();
 #endif
 
 	env_set_hex("board_rev", board_rev);
-
+	env_set_default_vars(10, (char * const *)default_vars, 0);
 	return 0;
 }
 
