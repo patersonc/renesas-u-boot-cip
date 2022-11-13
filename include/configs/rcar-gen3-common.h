@@ -65,42 +65,43 @@
 	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
 	"kernel_addr_r=0x48080000\0" \
 	"boot_efi_binary=efi/boot/"BOOTEFI_NAME"\0" \
-	"boot_mmc=" \
-			"if test -e mmc ${mmcdev}:1 ${boot_efi_binary}; then " \
-				"load mmc ${mmcdev}:1 " \
-				"${kernel_addr_r} ${boot_efi_binary};" \
-				"bootefi ${kernel_addr_r};" \
-			"elif test -e mmc ${mmcdev}:2 ${boot_efi_binary}; then " \
-				"load mmc ${mmcdev}:2 " \
-				"${kernel_addr_r} ${boot_efi_binary};" \
-				"bootefi ${kernel_addr_r};" \
-			"fi;\0" \
-	"boot_usb=" \
-			"if test -e usb ${usbdev}:1 ${boot_efi_binary}; then " \
-				"fatload usb ${usbdev}:1 " \
-				"${kernel_addr_r} ${boot_efi_binary};" \
-				"bootefi ${kernel_addr_r};" \
-			"elif test -e usb ${usbdev}:2 ${boot_efi_binary}; then " \
-				"fatload usb ${usbdev}:2 " \
-				"${kernel_addr_r} ${boot_efi_binary};" \
-				"bootefi ${kernel_addr_r};" \
-			"fi;\0" \
-	"load_mmc=" \
-			"setenv mmcdev 0;" \
-			"run boot_mmc;" \
-			"setenv mmcdev 1;" \
-			"run boot_mmc; \0" \
-	"load_usb=" \
+	"scan_boot_efi=" \
+		"part list ${devtype} ${devnum} devplist; "  \
+		"env exists devplist || setenv devplist 1; " \
+		"for distro_bootpart in ${devplist}; do " \
+			"if test -e ${devtype} ${devnum}:${distro_bootpart} ${boot_efi_binary}; then " \
+				"load ${devtype} ${devnum}:${distro_bootpart} " \
+				"${kernel_addr_r} ${boot_efi_binary};"          \
+				"echo BootEFI from <${devtype}> [${devnum}:${distro_bootpart}]; "\
+				"bootefi ${kernel_addr_r};"                     \
+			"fi;" \
+		"done;\0" \
+	"mmc0=" \
+			"setenv devnum 0;" \
+			"setenv devtype mmc;" \
+			"run scan_boot_efi;\0" \
+	"mmc1=" \
+			"setenv devnum 1;" \
+			"setenv devtype mmc;" \
+			"run scan_boot_efi;\0" \
+	"usb0=" \
 			"usb start;" \
-			"setenv usbdev 0;" \
-			"run boot_usb;"\
-			"setenv usbdev 1;" \
-			"run boot_usb;\0" \
+			"setenv devnum 0;" \
+			"setenv devtype usb;" \
+			"run scan_boot_efi;\0"\
+	"usb1=" \
+			"usb start;" \
+			"setenv devnum 1;" \
+			"setenv devtype usb;" \
+			"run scan_boot_efi;\0" \
+	"boot_targets=" \
+			"mmc0 mmc1 usb0 usb1\0" \
 	"distro_bootcmd=" \
-			"run load_mmc;" \
-			"run load_usb;\0" \
+			"env exists boot_targets || setenv boot_targets mmc0 mmc1 usb0 usb1; " \
+			"for target in ${boot_targets}; do "\
+				"run ${target};" \
+			"done;" \
 	"bootcmd=run distro_bootcmd\0" \
-
 
 
 #ifndef CONFIG_SPL_BUILD
