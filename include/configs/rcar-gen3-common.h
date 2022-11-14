@@ -61,6 +61,7 @@
 /* ENV setting */
 
 #define CONFIG_EXTRA_ENV_SETTINGS	\
+	"usb_pgood_delay=2000\0" \
 	"fdt_addr_r=0x48000000\0" \
 	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
 	"kernel_addr_r=0x48080000\0" \
