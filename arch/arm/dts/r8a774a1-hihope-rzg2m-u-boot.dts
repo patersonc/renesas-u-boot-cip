@@ -25,3 +25,7 @@
 		line-name = "wlan-reg-on";
 	};
 };
+
+&sdhi3 {
+	/delete-property/mmc-hs400-1_8v;
+};
