@@ -66,6 +66,9 @@
 	"fdtfile=r8a774a1-hihope-rzg2m.dtb\0" \
 	"kernel_addr_r=0x48080000\0" \
 	"boot_efi_binary=efi/boot/"BOOTEFI_NAME"\0" \
+	"scan_for_usb_dev=" \
+		"usb start; " \
+		"if test ! -e usb ${devnum}:1 /; then usb reset; fi;\0" \
 	"scan_boot_efi=" \
 		"part list ${devtype} ${devnum} devplist; "  \
 		"env exists devplist || setenv devplist 1; " \
@@ -86,14 +89,14 @@
 			"setenv devtype mmc;" \
 			"run scan_boot_efi;\0" \
 	"usb0=" \
-			"usb start;" \
 			"setenv devnum 0;" \
 			"setenv devtype usb;" \
+			"run scan_for_usb_dev;"\
 			"run scan_boot_efi;\0"\
 	"usb1=" \
-			"usb start;" \
 			"setenv devnum 1;" \
 			"setenv devtype usb;" \
+			"run scan_for_usb_dev;"\
 			"run scan_boot_efi;\0" \
 	"boot_targets=" \
 			"mmc0 mmc1 usb0 usb1\0" \
